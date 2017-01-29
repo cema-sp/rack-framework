@@ -19,7 +19,7 @@ RSpec.describe 'Forfun' do
   end
 
   let!(:browser) do
-    Rack::Test::Session.new(Rack::MockSession.new(Forfun::App))
+    Rack::Test::Session.new(Rack::MockSession.new(Forfun::App.instance))
   end
 
   describe '#get' do

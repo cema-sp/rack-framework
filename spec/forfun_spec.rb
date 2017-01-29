@@ -1,5 +1,5 @@
 require 'rack/test'
-require_relative '../forfun'
+require 'forfun'
 
 RSpec.describe 'Forfun' do
   shared_examples 'returns JSON' do
@@ -46,6 +46,20 @@ RSpec.describe 'Forfun' do
 
       it_behaves_like 'returns status', 404
       it_behaves_like 'returns JSON'
+    end
+
+    context 'when defined w/o block' do
+      before { get '/hh' }
+
+      subject { browser.get '/hh' }
+
+      it_behaves_like 'returns status', 200
+      it_behaves_like 'returns JSON'
+
+      it 'returns empty body' do
+        browser.get '/hh'
+        expect(browser.last_response.body).to eq(JSON.dump({}))
+      end
     end
   end
 

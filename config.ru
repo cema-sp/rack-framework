@@ -1,4 +1,6 @@
-require './forfun'
+$: << 'lib'
+
+require 'forfun'
 
 get '/bla' do
   { results: [1, 2, 3] }

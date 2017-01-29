@@ -10,6 +10,7 @@ module Forfun
 
   class App
     APP_HEADERS = { 'Content-Type' => 'application/json' }
+    APP_METHODS = %i(get post put patch delete)
 
     @@routes = {}
 
@@ -29,20 +30,21 @@ module Forfun
         [status, APP_HEADERS.merge(headers), body.map { |b| JSON.dump(b) }]
       end
 
-      def get(path)
-        map(:GET, path) do |_env|
-          result = yield
-          [200, {}, [result]]
-        end
-      end
+      APP_METHODS.each do |http_method|
+        define_method(http_method) do |path, &block|
+          map(http_method.upcase, path) do |env|
+            params = extract_params(env)
 
-      def post(path)
-        map(:POST, path) do |env|
-          raw_params = JSON.parse(env['rack.input'].read)
-          params = Forfun::Params[raw_params]
+            result = if block.nil?
+                       {}
+                     elsif params
+                       block.call(params)
+                     else
+                       block.call
+                     end
 
-          result = yield params
-          [200, {}, [result]]
+            [200, {}, [result]]
+          end
         end
       end
 
@@ -55,29 +57,33 @@ module Forfun
         @@routes[http_method_sanitized] ||= {}
         @@routes[http_method_sanitized][path_sanitized] = block.to_proc
       end
+
+      def extract_params(env)
+        return nil unless env['rack.input']
+
+        params_encoded = env['rack.input'].read
+        return nil if params_encoded.empty?
+
+        params_decoded = JSON.parse(params_encoded)
+
+        Forfun::Params[params_decoded]
+      end
     end
   end
 
-  class NotFound
-    def self.call(_env)
-      [404, {}, [{ error: 'Not Found' }]]
-    end
+  NotFound = lambda do |env|
+    [404, {}, [{ error: 'Not Found' }]]
   end
 
-  class InvalidParams
-    def self.call(_env)
-      [422, {}, [{ error: 'Invalid params' }]]
-    end
+  InvalidParams = lambda do |env|
+    [422, {}, [{ error: 'Invalid params' }]]
   end
 end
 
 # ------ DSL ------
 
-def get(path, &block)
-  Forfun::App.get(path, &block)
+Forfun::App::APP_METHODS.each do |http_method|
+  define_method(http_method) do |path, &block|
+    Forfun::App.send(http_method, path, &block)
+  end
 end
-
-def post(path, &block)
-  Forfun::App.post(path, &block)
-end
-

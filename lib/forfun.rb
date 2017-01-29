@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rack'
 require 'json'
 require 'hashie'
@@ -10,7 +12,7 @@ module Forfun
 
   class App
     APP_HEADERS = { 'Content-Type' => 'application/json' }
-    APP_METHODS = %i(get post put patch delete)
+    APP_METHODS = %i(get post put patch delete).freeze
 
     @@routes = {}
 

@@ -1,4 +1,7 @@
 # frozen_string_literal: true
+
+$: << 'lib'
+
 source "https://rubygems.org"
 
 gem 'rack'

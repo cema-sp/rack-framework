@@ -1,4 +1,4 @@
-$: << 'lib'
+# frozen_string_literal: true
 
 require 'forfun'
 

@@ -85,5 +85,6 @@ end
 Forfun::App::APP_METHODS.each do |http_method|
   define_method(http_method) do |path, &block|
     Forfun::App.send(http_method, path, &block)
+    run Forfun::App if respond_to? :run
   end
 end

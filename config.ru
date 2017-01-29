@@ -11,5 +11,3 @@ post '/bla' do |params|
 
   { name: name }
 end
-
-run Forfun::App

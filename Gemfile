@@ -5,6 +5,8 @@ gem 'rack'
 gem 'json'
 gem 'hashie'
 
-gem 'rspec'
-gem 'rack-test'
-gem 'pry'
+group :development do
+  gem 'rspec'
+  gem 'rack-test'
+  gem 'pry'
+end
